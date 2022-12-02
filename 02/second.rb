@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# Expected: 12
 
 score = {
     "A X" => 0 + 3,
@@ -14,4 +15,4 @@ score = {
     "C Z" => 6 + 1,
 }
 
-puts File.readlines('input').sum { |line| score[line[0..2]] }
+puts File.readlines(ARGV[0]).sum { |line| score[line[0..2]] }
