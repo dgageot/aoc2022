@@ -1,11 +1,13 @@
 #!/usr/bin/env ruby
 # Expected: 157
 
-def priority(l)
-    l.ord >= 'a'.ord ? l.ord - 'a'.ord + 1 : l.ord - 'A'.ord + 27
-end
+priorities = [*'a'..'z', *'A'..'Z'].zip(1..52).to_h
 
 puts File
     .foreach(ARGV[0])
-    .map { |line| priority(line.partition(/.{#{line.size/2}}/)[1,2].map { |s| s.split("")}.inject(:&).first)}
+    .map(&:chomp)
+    .map(&:chars)
+    .map { |line| line.each_slice(line.size / 2) }
+    .flat_map { |lr| lr.inject(:&) }
+    .map(&priorities)
     .sum
