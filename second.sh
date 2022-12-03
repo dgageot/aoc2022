@@ -8,4 +8,4 @@ echo "Expected: $(cat second.rb | awk '/Expected:/ {print $3}')"
 echo "     Got: $(ruby second.rb "sample")"
 echo
 
-ruby first.rb "input"
+ruby second.rb "input"
