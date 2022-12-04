@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 # Expected: 2
 
+require "active_support/all"
+
 puts File
-    .foreach(ARGV[0])
+    .readlines(ARGV[0])
     .map { |l| l.split(/[,-]/).map(&:to_i) }
     .count { |g|
         l = g[0]..g[1]

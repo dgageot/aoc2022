@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
 # Expected: NaN
 
-puts File.readlines(ARGV[0]).count
+require "active_support/all"
+
+puts File
+    .readlines(ARGV[0])
+    .map(&:chomp)
+    .count

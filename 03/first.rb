@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 # Expected: 157
 
+require "active_support/all"
+
 puts File
-    .foreach(ARGV[0])
+    .readlines(ARGV[0])
     .map(&:chomp)
     .map(&:chars)
     .map { |line| line.each_slice(line.size / 2) }

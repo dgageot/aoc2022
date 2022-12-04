@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 # Expected: 70
 
+require "active_support/all"
+
 puts File
-    .foreach(ARGV[0])
+    .readlines(ARGV[0])
     .map(&:chomp)
     .each_slice(3)
     .flat_map { |group| group.map(&:chars).inject(:&) }

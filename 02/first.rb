@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 # Expected: 15
 
+require "active_support/all"
+
 puts File
-    .foreach(ARGV[0])
+    .readlines(ARGV[0])
     .map(&:chomp)
     .sum(&{
         "A X" => 1 + 3,
