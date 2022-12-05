@@ -4,23 +4,18 @@
 require "active_support/all"
 require 'scanf'
 
-stacks = []
 map, moves = File
     .readlines(ARGV[0])
     .split(&:blank?)
 
-map
-    .reverse[1..-1]
-    .map { |line| line.scan(/....?/) }
-    .each { |line|
-        line.each_with_index { |v, i|
-            stacks[i] = (stacks[i] || []) + [v[1]] if !v.blank?
-        }
-    }
+stacks = map[0..-2]
+    .map { |line| line.scan(/.(.). ?/).flatten }
+    .transpose
+    .map { |list| list.reject(&:blank?).reverse }
 
 moves
-    .each { |move|
-        count, from, to = move.scanf("move %d from %d to %d")
+    .map { |move| move.scanf("move %d from %d to %d")}
+    .each { |count, from, to|
         stacks[to - 1] += stacks[from - 1].pop(count).reverse
     }
 
