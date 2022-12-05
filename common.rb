@@ -1,4 +1,4 @@
-require "../common.rb"
+require "active_support/all"
 require "scanf"
 
 class Array
