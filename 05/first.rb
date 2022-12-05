@@ -1,14 +1,13 @@
 #!/usr/bin/env ruby
 # Expected: CMZ
 
-require "active_support/all"
-require 'scanf'
+require "../common.rb"
 
-map, moves = File
+crates, moves = File
     .readlines(ARGV[0])
     .split(&:blank?)
 
-stacks = map[0..-2]
+stacks = crates[0..-2]
     .map { |line| line.scan(/.(.). ?/).flatten }
     .transpose
     .map { |list| list.reject(&:blank?).reverse }

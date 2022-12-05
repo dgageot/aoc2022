@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Expected: 157
 
-require "active_support/all"
+require "../common.rb"
 
 puts File
     .readlines(ARGV[0])
