@@ -2,6 +2,10 @@ require "active_support/all"
 require "scanf"
 
 class Array
+    def chop
+        self[..-2]
+    end
+
     def top(count)
         self.sort.take(3)
     end
