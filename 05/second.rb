@@ -5,12 +5,11 @@ require "active_support/all"
 require 'scanf'
 
 stacks = []
-parts = File
+map, moves = File
     .readlines(ARGV[0])
     .split(&:blank?)
 
-parts
-    .first
+map
     .reverse[1..-1]
     .map { |line| line.scan(/....?/) }
     .each { |line|
@@ -19,8 +18,7 @@ parts
         }
     }
 
-parts
-    .last
+moves
     .each { |move|
         count, from, to = move.scanf("move %d from %d to %d")
         stacks[to - 1] += stacks[from - 1].pop(count)
