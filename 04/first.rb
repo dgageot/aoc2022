@@ -2,10 +2,11 @@
 # Expected: 2
 
 require "active_support/all"
+require 'scanf'
 
 puts File
     .readlines(ARGV[0])
-    .map { |l| l.split(/[,-]/).map(&:to_i) }
+    .map { |l| l.scanf("%d-%d,%d-%d") }
     .count { |g|
         l = g[0]..g[1]
         r = g[2]..g[3]
