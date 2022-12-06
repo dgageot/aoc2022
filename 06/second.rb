@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
-# Expected: NaN
+# Expected: 19
 
-require "../common.rb"
+len = 14
 
-puts File
-    .readlines(ARGV[0])
-    .map(&:chomp)
-    .count
+msg = File.read(ARGV[0]).chomp.chars
+puts len + msg.size.times.select { |i| msg[i, len].uniq.count == len }.first
