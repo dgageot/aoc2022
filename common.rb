@@ -7,11 +7,11 @@ class Array
     end
 
     def top(count)
-        self.sort.take(3)
+        self.sort.take(count)
     end
 
     def bottom(count)
-        self.sort.reverse.take(3)
+        self.sort.reverse.take(count)
     end
 
     def split2()

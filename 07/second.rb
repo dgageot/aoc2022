@@ -1,9 +1,26 @@
 #!/usr/bin/env ruby
-# Expected: NaN
+# Expected: 24933642
 
-require "../common.rb"
+pwd = []
+total = Hash.new(0)
 
-puts File
+File
     .readlines(ARGV[0])
     .map(&:chomp)
-    .count
+    .each { |cmd|
+        case cmd
+        when /\$ cd \.\./
+            pwd.pop
+        when /\$ cd (.+)/
+            pwd.push($1)
+        when /(\d*) .*/
+            length = $1.to_i
+            pwd.size.times.each { |i|
+                dir = pwd[0..i]
+                total[dir] += length
+            }
+        end
+    }
+
+required = total[["/"]] - 40000000
+puts total.values.select { |v| v >= required }.sort.first
