@@ -9,7 +9,7 @@ File
     .map(&:chomp)
     .each { |cmd|
         case cmd
-        when /\$ cd \.\./
+        when "$ cd .."
             pwd.pop
         when /\$ cd (.+)/
             pwd.push($1)
