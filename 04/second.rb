@@ -3,8 +3,8 @@
 
 require "../common.rb"
 
-puts File
-    .readlines(ARGV[0])
+p STDIN
+    .readlines(chomp: true)
     .map { |l| l.scanf("%d-%d,%d-%d") }
     .count { |g|
         l = g[0]..g[1]

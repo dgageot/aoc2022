@@ -3,9 +3,7 @@
 
 len = 14
 
-File
-    .read(ARGV[0])
-    .chomp
+STDIN.readline(chomp: true)
     .chars
     .each_cons(len)
     .find_index { |letters| letters.uniq.count == len }

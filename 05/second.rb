@@ -3,8 +3,8 @@
 
 require "../common.rb"
 
-crates, moves = File
-    .readlines(ARGV[0])
+crates, moves = STDIN
+    .readlines(chomp: true)
     .split(&:blank?)
 
 stacks = crates[0..-2]

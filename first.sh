@@ -5,7 +5,7 @@ set -e
 cd "$1" >/dev/null
 
 echo "Expected: $(cat first.rb | awk '/Expected:/ {print $3}')"
-echo "     Got: $(ruby first.rb "sample")"
+echo "     Got: $(cat "sample" | ruby first.rb)"
 echo
 
-ruby first.rb "input"
+cat "input" | ruby first.rb

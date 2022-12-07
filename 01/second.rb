@@ -3,8 +3,8 @@
 
 require "../common.rb"
 
-puts File
-    .readlines(ARGV[0])
+p STDIN
+    .readlines(chomp: true)
     .split(&:blank?)
     .map { |values| values.sum(&:to_i) }
     .sort

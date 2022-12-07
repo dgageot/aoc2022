@@ -1,11 +1,8 @@
 #!/usr/bin/env ruby
 # Expected: 157
 
-require "../common.rb"
-
-puts File
-    .readlines(ARGV[0])
-    .map(&:chomp)
+p STDIN
+    .readlines(chomp: true)
     .map(&:chars)
     .map { |line| line.each_slice(line.size / 2) }
     .flat_map { |lr| lr.inject(:&) }

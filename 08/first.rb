@@ -1,9 +1,8 @@
 #!/usr/bin/env ruby
 # Expected: NaN
 
-require "../common.rb"
+# require "../common.rb"
 
-puts File
-    .readlines(ARGV[0])
-    .map(&:chomp)
+p STDIN
+    .readlines(chomp: true)
     .count

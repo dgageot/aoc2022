@@ -1,11 +1,8 @@
 #!/usr/bin/env ruby
 # Expected: 12
 
-require "../common.rb"
-
-puts File
-    .readlines(ARGV[0])
-    .map(&:chomp)
+p STDIN
+    .readlines(chomp: true)
     .sum(&{
         "A X" => 0 + 3,
         "A Y" => 3 + 1,
