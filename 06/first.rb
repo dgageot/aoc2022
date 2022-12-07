@@ -7,4 +7,6 @@ File
     .read(ARGV[0])
     .chomp
     .chars
-    .tap { |msg| puts len + msg.size.times.find { |i| msg[i, len].uniq.count == len }}
+    .each_cons(len)
+    .find_index { |letters| letters.uniq.count == len }
+    .tap { |i| p len + i }
