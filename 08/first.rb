@@ -16,8 +16,7 @@ grid.each_with_index do |row, y|
         up = transposed[x][0...y]
         down = transposed[x][y+1...]
 
-        seen = ->(neighbours) { neighbours.none? { |t| t >= tree} }
-        count +=1 if seen[left] || seen[right] || seen[up] || seen[down]
+        count +=1 if [left, right, up, down].any? { |neighbours| neighbours.none? { |t| t >= tree} }
     end
 end
 

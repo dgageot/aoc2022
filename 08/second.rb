@@ -16,12 +16,11 @@ grid.each_with_index do |row, y|
         up = transposed[x][0...y]
         down = transposed[x][y+1...]
 
-        scenic = ->(neighbours) {
+        score = [up.reverse, down, left.reverse, right].map { |neighbours|
             highest = neighbours.index { |t| t >= tree }
             highest ? highest + 1 : neighbours.size
-        }
+        }.inject(&:*)
 
-        score = scenic[up.reverse] * scenic[down] * scenic[left.reverse] * scenic[right]
         max = [max, score].max
     end
 end
