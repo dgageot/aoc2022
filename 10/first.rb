@@ -1,12 +1,8 @@
 #!/usr/bin/env ruby
 # Expected: 13140
 
-# require "../common.rb"
-
 x = 1
-# cycle = 1
 strength = 0
-screen = ["."] * 240
 
 STDIN
     .readlines(chomp: true)
@@ -20,9 +16,7 @@ STDIN
     }
     .each.with_index { |op, i|
         cycle = i + 1
-        if ((cycle + 20) % 40) == 0 then
-            strength += (cycle * x)
-        end
-        x = x + op
+        strength += (cycle * x) if [20, 60, 100, 140, 180, 220].include?(cycle)
+        x += op
     }
-p screen.split(40)
+p strength

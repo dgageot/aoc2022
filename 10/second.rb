@@ -1,12 +1,8 @@
 #!/usr/bin/env ruby
 # Expected: 13140
 
-# require "../common.rb"
-
 x = 1
-# cycle = 1
-strength = 0
-screen = ["."] * 240
+screen = [" "] * 240
 
 STDIN
     .readlines(chomp: true)
@@ -19,10 +15,7 @@ STDIN
         end
     }
     .each.with_index { |op, i|
-        cycle = i + 1
-        if ((cycle + 20) % 40) == 0 then
-            strength += (cycle * x)
-        end
+        screen[i] = "█" if ((i%40) - x).abs <=1
         x = x + op
     }
-p screen.split(40)
+screen.each_slice(40).each{ |line| puts line.join }
