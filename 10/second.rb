@@ -1,21 +1,17 @@
 #!/usr/bin/env ruby
-# Expected: 13140
+# Expected: EGJBGCFK
+
+require "../common.rb"
 
 x = 1
-screen = [" "] * 240
 
 STDIN
     .readlines(chomp: true)
-    .flat_map { |line|
-        case line
-        when "noop"
-            [0]
-        when /addx (.+)/
-            [0, $1.to_i]
-        end
-    }
-    .each.with_index { |op, i|
-        screen[i] = "█" if ((i%40) - x).abs <=1
-        x = x + op
-    }
-screen.each_slice(40).each{ |line| puts line.join }
+    .flat_map { |cmd| [0] + cmd.scanf("addx %d") }
+    .map.with_index do |op, i|
+        (x - i%40).abs <= 1 ? "█" : " "
+    ensure
+        x += op
+    end
+    .each_slice(40)
+    .each { |pixels| puts pixels.join }
