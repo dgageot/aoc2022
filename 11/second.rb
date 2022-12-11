@@ -33,18 +33,10 @@ monkeys = STDIN
     .chunk_while { |line| !line.empty? }
     .map { |desc|
         items = desc[1].split(": ")[1].split(", ").map(&:to_i)
-        sign, value = desc[2].scanf("  Operation: new = old %s %s")
-        op = if sign == "*"
-            if value == "old" then
-                ->(worry) { worry * worry }
-            else
-                v = value.to_i
-                ->(worry) { worry * v }
-            end
-        else
-            v = value.to_i
-            ->(worry) { worry + v }
-        end
+        sign, v = desc[2].scanf("  Operation: new = old %s %s")
+        op = ->(old) { old * old } if sign == "*" && v == "old"
+        op = ->(old) { old * v.to_i } if sign == "*" && v != "old"
+        op = ->(old) { old + v.to_i } if sign == "+"
         divisor = desc[3].scanf("Test: divisible by %d")[0]
         ifTrue = desc[4].scanf("If true: throw to monkey %d")[0]
         ifFalse = desc[5].scanf("If false: throw to monkey %d")[0]
