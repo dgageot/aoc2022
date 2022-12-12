@@ -6,14 +6,13 @@ require "rgl/dijkstra.rb"
 require "parallel"
 
 class Node
-    attr_reader :x, :y, :letter
+    attr_reader :letter
 
-    def initialize(letter, x, y)
-        @letter, @x, @y = letter, x, y
+    def initialize(letter)
+        @letter = letter
     end
 end
 
-start = [0, 0]
 dest = [0, 0]
 nodes = {}
 graph = RGL::DirectedAdjacencyGraph.new
@@ -22,23 +21,22 @@ STDIN
     .readlines(chomp: true)
     .map(&:chars)
     .each.with_index do |row, y|
-        row.each.with_index do |elevation, x|
-            if elevation == "S" then
-                start = [x, y]   
-                elevation = "a" 
-            elsif elevation == "E" then
+        row.each.with_index do |letter, x|
+            if letter == "S" then
+                letter = "a" 
+            elsif letter == "E" then
                 dest = [x, y]
-                elevation = "z"
+                letter = "z"
             end
 
-            node = Node.new(elevation, x, y)
+            node = Node.new(letter)
             graph.add_vertex(node)
             nodes[[x, y]] = node
         end
     end
 
-nodes.each_value do |node|
-    x, y = node.x, node.y
+nodes.each do |xy, node|
+    x, y = *xy
     [[x - 1, y], [x + 1, y], [x, y + 1], [x, y - 1]]
     .map { |coord| nodes[coord] }
     .compact
