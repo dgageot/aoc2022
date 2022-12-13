@@ -1,28 +1,23 @@
 #!/usr/bin/env ruby
-# Expected: 13140
+# Expected: 24933642
 
-# require "../common.rb"
+pwd = []
+total = Hash.new(0)
 
-x = 1
-# cycle = 1
-strength = 0
-screen = ["."] * 240
-
-STDIN
-    .readlines(chomp: true)
-    .flat_map { |line|
-        case line
-        when "noop"
-            [0]
-        when /addx (.+)/
-            [0, $1.to_i]
+STDIN.each_line(chomp: true) do |line|
+    case line
+    when "$ cd .."
+        pwd.pop
+    when /\$ cd (.+)/
+        pwd.push($1)
+    when /(\d*) .*/
+        length = $1.to_i
+        pwd.size.times.each do |i|
+            dir = pwd[0..i]
+            total[dir] += length
         end
-    }
-    .each.with_index { |op, i|
-        cycle = i + 1
-        if ((cycle + 20) % 40) == 0 then
-            strength += (cycle * x)
-        end
-        x = x + op
-    }
-p screen.split(40)
+    end
+end
+
+required = total[["/"]] - 40000000
+puts total.values.select { |v| v >= required }.min
