@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 # Expected: 36
 
-require "../common.rb"
+require "scanf"
+require "set"
 
 class XY
     attr_reader :x, :y

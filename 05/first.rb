@@ -5,7 +5,7 @@ require "../common.rb"
 
 crates, moves = STDIN
     .readlines(chomp: true)
-    .split(&:blank?)
+    .split(&:empty?)
 
 stacks = crates[0..-2]
     .map { |line| line.scan(/.(.). ?/).flatten }

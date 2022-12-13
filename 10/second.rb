@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Expected: EGJBGCFK
 
-require "../common.rb"
+require "scanf"
 
 x = 1
 

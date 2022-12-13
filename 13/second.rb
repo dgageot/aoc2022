@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Expected: 140
 
-require "../common.rb"
+require "json"
 
 def compare(l, r)
     case [l, r]
@@ -12,11 +12,7 @@ def compare(l, r)
     in [Integer, Integer]
         l <=> r
     in [Array, Array]
-        [l.size, r.size].max.times do |i|
-            io = compare(l[i], r[i])
-            return io if io != 0
-        end
-        0
+        [l.size, r.size].max.times.map { |i| compare(l[i], r[i]) }.select { |v| v != 0 }.first || 0
     in [Integer, _]
         compare([l], r)
     in [_, Integer]
@@ -24,10 +20,14 @@ def compare(l, r)
     end
 end
 
-lines = STDIN.readlines(chomp: true).reject(&:empty?).map { |line| JSON.parse(line) }
+separators = [ [[2]], [[6]] ]
 
-sep1, sep2 = [[2]], [[6]]
-lines += [sep1, sep2]
-
-sorted = lines.sort { |l, r| compare(l, r) }
-p (1 + sorted.find_index(sep1)) * (1 + sorted.find_index(sep2))
+STDIN
+    .readlines(chomp: true)
+    .reject(&:empty?)
+    .map { |line| JSON.parse(line) }
+    .push(*separators)
+    .sort { |l, r| compare(l, r) }
+    .tap { |sorted|
+        p separators.map { |sep| 1 + sorted.find_index(sep) }.inject(&:*)
+    }

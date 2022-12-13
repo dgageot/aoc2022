@@ -5,7 +5,7 @@ require "../common.rb"
 
 p STDIN
     .readlines(chomp: true)
-    .split(&:blank?)
+    .split(&:empty?)
     .map { |values| values.sum(&:to_i) }
     .sort
     .last(3)

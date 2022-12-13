@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Expected: 13140
 
-require "../common.rb"
+require "scanf"
 
 x = 1
 strength = 0
