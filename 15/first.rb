@@ -26,7 +26,7 @@ used = ranges.sum { |range|
 }
 
 p used - lines
-    .select { |_, _, xb, yb| yb == y }
+    .select { |_, _, _, yb| yb == y }
     .map { |_, _, xb, _| xb }
     .uniq
     .count { |xb| ranges.any? { |range| range.include?(xb) } }
