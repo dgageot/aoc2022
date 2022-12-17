@@ -2,57 +2,34 @@
 # Expected: 1707
 
 require "scanf"
-require "set"
 require "rgl/adjacency"
 require "rgl/dijkstra.rb"
 require "parallel"
 
-class Valve
-    attr_reader :name, :rate, :leads_to
+Valve = Struct.new(:name, :rate, :leads_to)
 
-    def initialize(name, rate, leads_to)
-        @name, @rate, @leads_to = name, rate, leads_to
-    end
-end
-
-D = 26
 G = RGL::DirectedAdjacencyGraph.new
 valves = {}
 STDIN
     .readlines(chomp: true)
     .each do |line|
-        spec = line.split("; ")
-        name, rate = spec[0].scanf("Valve %s has flow rate=%d")
-        leads_to = spec[1][22..].split(", ").map(&:strip)
-        valve = Valve.new(name, rate, leads_to)
-        valves[name] = valve
-        G.add_vertex(valve.name)
+        name, rate, leads = line.scanf("Valve %s has flow rate=%d; %*s %*s to %*s %[^\n]")
+        valves[name] = Valve.new(name, rate, leads.split(",").map(&:strip))
+        G.add_vertex(name)
     end
-
 valves.values.each { |v| v.leads_to.each { |d| G.add_edge(v.name, d) } }
-LENGTH = {}
-valves.values.permutation(2) do |s, e|
-    LENGTH[[s.name, e.name]] = G.dijkstra_shortest_path(Hash.new(1), s.name, e.name).size
+
+LEN = valves.keys.permutation(2).to_h { |s, e| [[s, e], G.dijkstra_shortest_path(Hash.new(1), s, e).size] }
+def released(root, closed, t)
+    return 0 if t >= 26
+
+    released = (26 - t) * root.rate
+    return released if closed.empty?
+
+    released + closed.map { |c| released(c, closed - [c], t + LEN[[root.name, c.name]]) }.max
 end
 
-class Search
-    def initialize(valves)
-        @valves = valves
-    end
-
-    def released(root, candidates, t)
-        return 0 if t >= D
-
-        released = (D - t) * @valves[root].rate
-        return released if candidates.empty?
-
-        released + candidates.map { |c|
-            released(c, candidates - [c], t + LENGTH[[root, c]])
-        }.max
-    end
-end
-
-candidates = valves.values.select { |v| v.rate > 0 }.map { |v| v.name }
+candidates = valves.values.select { |v| v.rate > 0 }
 combinations = Enumerator.new do |y|
     ((candidates.size + 2) / 2).times do |n|
         candidates.combination(n).each do |combination|
@@ -61,9 +38,8 @@ combinations = Enumerator.new do |y|
     end
 end
 
-search = Search.new(valves)
 p Parallel.map(combinations) { |combination|
-    search.released("AA", combination, 0) +
-    search.released("AA", candidates - combination, 0)
+    released(valves["AA"], combination, 0) +
+    released(valves["AA"], candidates - combination, 0)
 }
 .max
