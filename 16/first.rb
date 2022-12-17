@@ -37,7 +37,6 @@ end
 class Search
     def initialize(valves)
         @valves = valves
-        @cache = {}
     end
 
     def released(root, candidates, t)

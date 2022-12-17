@@ -5,6 +5,7 @@ require "scanf"
 require "set"
 require "rgl/adjacency"
 require "rgl/dijkstra.rb"
+require "parallel"
 
 class Valve
     attr_reader :name, :rate, :leads_to
@@ -37,7 +38,6 @@ end
 class Search
     def initialize(valves)
         @valves = valves
-        @cache = {}
     end
 
     def released(root, candidates, t)
@@ -53,22 +53,17 @@ class Search
 end
 
 candidates = valves.values.select { |v| v.rate > 0 }.map { |v| v.name }
-cache = {}
-max = 0
-
-# 2576
-candidates.size.times do |n|
-    candidates.permutation(n).each do |perm|
-        left = perm.sort
-        right = candidates - left
-
-        lr = cache[left] ||= Search.new(valves).released("AA", left, 0)
-        rr = cache[right] ||= Search.new(valves).released("AA", right, 0)
-        lr + rr
-        if lr + rr > max then
-            max = lr + rr
-            p max
+combinations = Enumerator.new do |y|
+    ((candidates.size + 2) / 2).times do |n|
+        candidates.combination(n).each do |combination|
+            y << combination
         end
     end
 end
-p max
+
+search = Search.new(valves)
+p Parallel.map(combinations) { |combination|
+    search.released("AA", combination, 0) +
+    search.released("AA", candidates - combination, 0)
+}
+.max
