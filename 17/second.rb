@@ -35,14 +35,21 @@ class Board
         @moves = moves
         @current_move = 0
         @cache = {}
+        @cycle_key = nil
+        @cycle_start = 0
+        @forms = [
+            ["-", ["..@@@@."]],
+            ["+", ["...@...", "..@@@..", "...@..."]],
+            ["L", ["....@..", "....@..", "..@@@.."]],
+            ["I", ["..@....", "..@....", "..@....", "..@...."]],
+            ["□", ["..@@...", "..@@..."]],
+        ].cycle
     end
 
     def draw(form, row)
         form.lines.each.with_index do |line, y|
             line.each_char.with_index do |c, x|
-                if c == "@" then
-                    @lines[row + y][x] = "#" 
-                end
+                @lines[row + y][x] = "#" if c == "@"
             end
         end
     end
@@ -52,46 +59,36 @@ class Board
             line.each_char.with_index do |c, x|
                 if c != "." then
                     return false if @lines[row + y] == nil
-                    if @lines[row + y][x] != "." then
-                        return false
-                    end
+                    return false if @lines[row + y][x] != "."
                 end
             end
         end
         true
     end
 
-    def play(turn, form, debug = false)
-        # if @current_move == 161 && form.name == "-"
-        #     # puts turn
-        #     # exit
-        # end
-        # key = [@current_move, form.name]
-        # if @cache[key] != nil then
-        #     if @current_move == 161 && form.name == "-"
-        #         puts "YES!!! #{turn} #{@cache[key]} #{@current_move} #{form.name}"
-        #     end
-        #     # exit
-        # else
-        #     @cache[key] = turn
-        #     # puts "#{turn} #{@current_move} #{form.name}"
-        # end
+    def play(turn, search_cycles = false)
+        form = Form.new(*@forms.next)
+        if search_cycles then
+            key = [@current_move, form.name]
+            return @cache[key], @cycle_start, turn if key == @cycle_key
+
+            if @cache[key] != nil then
+                if @cycle_key == nil then
+                    @cycle_start = turn
+                    @cycle_key = key
+                end
+            else
+                @cache[key] = turn
+            end
+        end
 
         add_lines(3 + form.height)
         row = 0
         loop do
-            debug(form, row) if debug
             move = @moves[@current_move]
             @current_move = (@current_move + 1) % @moves.size
             moved = form.jet(move)
-            if fits(moved, row) then
-                puts "FITS #{move}" if debug
-                debug(form, row) if debug
-                form = moved
-                debug(form, row) if debug
-            else
-                puts "NO FIT #{move}" if debug
-            end
+            form = moved if fits(moved, row)
             if !fits(form, row + 1) then
                 draw(form, row)
                 return
@@ -104,11 +101,6 @@ class Board
 
     def height
         @lines.size
-    end
-
-    def print
-        puts "============================================="
-        puts @lines.map { |line| line }.join("\n")
     end
 
     def crop
@@ -131,67 +123,39 @@ class Board
             @lines = [EMPTY.dup] + @lines
         end
     end
-
-    def debug
-        length = 9
-        return if @lines.size < (length * 2)
-
-        @lines[0, @lines.size - length].each_cons(length) do |pattern|
-            if pattern == @lines[-length..] then
-                puts height
-                exit
-            end
-        end
-
-        # p @lines
-        # p @lines[0] 
-        # p @lines[1]
-        # p @lines[-2]
-        # p @lines[-1]
-
-        # if @lines[0] == @lines[-1] then 
-        #     p "!!!!!!!!! #{height}"
-        # end
-        # exit
-    end
 end
 
 moves = STDIN.readlines(chomp: true)[0].chars
 
-forms = [
-    ["-", ["..@@@@."]],
-    ["+", ["...@...", "..@@@..", "...@..."]],
-    ["L", ["....@..", "....@..", "..@@@.."]],
-    ["I", ["..@....", "..@....", "..@....", "..@...."]],
-    ["□", ["..@@...", "..@@..."]],
-].cycle
+cycle_finder = Enumerator.new do |y|
+    board = Board.new(moves)
+    10000.times { |i|
+        result = board.play(i, true)
+        if result != nil then
+            y << result
+            return
+        end
+    }
+end
 
-# 15 -> 25
-# 16 -> 26
-# 16+35x1 -> 79 = 26 + 56
-# 16+35x2 -> 132 = 26 + 53x2
-# 16+35x3 -> 185 = 26 + 53x2
-# (((1000000000000 - 16 + 1) / 35) * 53) + 25
-
-# 1764 -> 2817
-# 1765 -> 2817
-# 1765+111 -> 2973 = 156 + 2817
-# 1765+1735*1 -> 5598 = 2817 + 2781 * 1
-# 1765+1735*1+110 -> 5753 = 2817 + 2781 * 1 + 155
-# 1765+1735*2 -> 8379 = 2817 + 2781 * 2
-# 1765+1735*3 -> 11160 = 2817 + 2781 * 3
-# 1765+1735*4 -> 13941 = 2817 + 2781 * 4
-# 1765+1735*30 -> 86247 = 2817 + 2781 * 30
-# 1765+1735*56 -> 158553 = 2817 + 2781 * 56
-# 1765+1735*56 -> 158553
-# 1765+1735*30+110 -> 86402 = 2817 + 2781 * 30 + 155
-# 1765+(1735*576368875) ->  2817 + 2781 * 576368875 = 1602881844192
-# 1765+(1735*576368875)+110=1000000000000 -> 2817 + 2781 * 576368875 + 155
-# 1602881844347
+start, from, to = cycle_finder.first
+cycle = to - from
 
 board = Board.new(moves)
-(1765+1735*30+110).times { |i|
-    desc = forms.next
-    board.play(i, Form.new(desc[0], desc[1]))
-}
-p board.height
+(from + 1).times { |i| board.play(i)}
+from_height = board.height
+
+board = Board.new(moves)
+(to + 1).times { |i| board.play(i)}
+to_height = board.height
+per_cycle = to_height - from_height
+
+count = 1000000000000
+remaining = (count - (from + 1)) % cycle
+cycles = (count - (from + 1)) / cycle
+
+board = Board.new(moves)
+(from + remaining + 1).times { |i| board.play(i)}
+remaining_height = board.height
+
+p per_cycle * cycles + remaining_height

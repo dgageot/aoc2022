@@ -38,9 +38,7 @@ class Board
     def draw(form, row)
         form.lines.each.with_index do |line, y|
             line.each_char.with_index do |c, x|
-                if c == "@" then
-                    @lines[row + y][x] = "#" 
-                end
+                @lines[row + y][x] = "#" if c == "@"
             end
         end
     end
@@ -50,31 +48,21 @@ class Board
             line.each_char.with_index do |c, x|
                 if c != "." then
                     return false if @lines[row + y] == nil
-                    if @lines[row + y][x] != "." then
-                        return false
-                    end
+                    return false if @lines[row + y][x] != "."
                 end
             end
         end
         true
     end
 
-    def play(form, debug = false)
+    def play(form)
         add_lines(3 + form.height)
         row = 0
         loop do
-            debug(form, row) if debug
             move = @moves[@current_move]
             @current_move = (@current_move + 1) % @moves.size
             moved = form.jet(move)
-            if fits(moved, row) then
-                puts "FITS #{move}" if debug
-                debug(form, row) if debug
-                form = moved
-                debug(form, row) if debug
-            else
-                puts "NO FIT #{move}" if debug
-            end
+            form = moved if fits(moved, row)
             if !fits(form, row + 1) then
                 draw(form, row)
                 return
@@ -87,11 +75,6 @@ class Board
 
     def height
         @lines.size
-    end
-
-    def print
-        puts "============================================="
-        puts @lines.map { |line| line }.join("\n")
     end
 
     def crop
@@ -116,8 +99,6 @@ class Board
     end
 end
 
-moves = STDIN.readlines(chomp: true)[0].chars
-
 forms = [
     ["..@@@@."],
     ["...@...", "..@@@..", "...@..."],
@@ -126,6 +107,7 @@ forms = [
     ["..@@...", "..@@..."],
 ].cycle
 
+moves = STDIN.readlines(chomp: true)[0].chars
 board = Board.new(moves)
 2022.times { |i| board.play(Form.new(forms.next)) }
 p board.height
