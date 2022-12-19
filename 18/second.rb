@@ -2,7 +2,14 @@
 # Expected: 58
 
 Cube = Struct.new(:x, :y, :z)
-
+DIRECTIONS = [
+    [+1, +0, +0],
+    [-1, +0, +0],
+    [+0, +1, +0],
+    [+0, -1, +0],
+    [+0, +0, +1],
+    [+0, +0, -1],
+]
 cubes = STDIN
     .readlines(chomp: true)
     .map { |line| line.split(",").map(&:to_i) }
@@ -11,7 +18,7 @@ cubes = STDIN
 space = cubes.to_h { |c| [[c.x, c.y, c.z], "█"] }
 
 cubes.each do |c|
-    [[+1, +0, +0], [-1, +0, +0], [+0, +1, +0], [+0, -1, +0], [+0, +0, +1], [+0, +0, -1]].each do |x, y, z|
+    DIRECTIONS.each do |x, y, z|
         coord = [c.x + x, c.y + y, c.z + z]
         next if space[coord] == "█"
         space[coord] ||= 0
@@ -39,26 +46,20 @@ class Tester
     def flood
         @space[[@min_x, @min_y, @min_z]] = "W"
         loop do
-            break if flood_once == 0
+            break if flood_once
         end
     end
 
     def flood_once
-        changed = 0
-
+        changed = false
         (@min_x..@max_x).each do |x|
             (@min_y..@max_y).each do |y|
                 (@min_z..@max_z).each do |z|
                     next if @space[[x, y, z]] == "█" || @space[[x, y, z]] == "W"
+                    next unless DIRECTIONS.any? { |dx, dy, dz| @space[[x + dx, y + dy, z + dz]] == "W" }
 
-                    flooded = [[+1, +0, +0], [-1, +0, +0], [+0, +1, +0], [+0, -1, +0], [+0, +0, +1], [+0, +0, -1]].any? { |dx, dy, dz|
-                        @space[[x + dx, y + dy, z + dz]] == "W"
-                    }
-                    if flooded then
-                        @space[[x, y, z]] = "W" 
-                        changed += 1
-                        next
-                    end
+                    @space[[x, y, z]] = "W" 
+                    changed = true
                 end
             end
         end
